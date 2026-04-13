@@ -1,151 +1,361 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Saimom Car | Gestão Financeira</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <style>
-:root{--bg:#0b0d10;--panel:#121821;--panel2:#1a2330;--line:#2a3645;--text:#eef4f9;--muted:#98a5b3;--gold:#c8a36a;--green:#1f9d62;--red:#dd5a54;--blue:#4b88ff;--orange:#f0ad4e}
+:root{--bg:#0b0f15;--bg2:#101826;--panel:#121b2a;--line:#28384f;--text:#eef4f9;--muted:#9caaba;--gold:#c8a36a;--green:#1f9d62;--red:#dd5a54;--blue:#4b88ff;--shadow:0 16px 30px rgba(0,0,0,.28)}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Inter,Arial,sans-serif;background:linear-gradient(180deg,#090b0e,#111722);color:var(--text);min-height:100vh}
-.container{max-width:1700px;margin:0 auto;padding:18px}
-.topbar{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:14px}
-.brand h1{font-size:clamp(18px,2.5vw,26px)}
-.brand p{color:var(--muted);font-size:12px;margin-top:4px}
-button,input,select,textarea{font:inherit}
-button{padding:10px 14px;border-radius:12px;border:1px solid var(--line);background:var(--panel2);color:var(--text);cursor:pointer;transition:opacity .15s}
-button:hover{opacity:.85}
-button.primary{background:var(--gold);color:#101010;font-weight:700;border-color:#d8b98b}
+body{font-family:Inter,Arial,sans-serif;background:linear-gradient(180deg,var(--bg),var(--bg2));color:var(--text);min-height:100vh}
+.app-shell{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
+@media(max-width:980px){.app-shell{grid-template-columns:1fr}}
+.sidebar{border-right:1px solid var(--line);background:#0d1522;padding:18px;display:grid;grid-template-rows:auto 1fr auto;gap:16px}
+@media(max-width:980px){.sidebar{display:none}}
+.brand{display:flex;align-items:center;gap:10px}
+.logo{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--gold),#f4d7aa);display:grid;place-items:center;color:#111;font-weight:900}
+.brand h1{font-size:18px}
+.brand p{font-size:12px;color:var(--muted)}
+.nav{display:grid;gap:8px}
+.nav button{width:100%;text-align:left}
+.container{padding:16px 18px 28px}
+.appbar{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:rgba(18,27,42,.95);border:1px solid var(--line);border-radius:16px;padding:10px 12px;margin-bottom:14px;box-shadow:var(--shadow)}
+.app-title{font-size:18px}
+button,input{font:inherit}
+button{padding:10px 14px;border-radius:12px;border:1px solid var(--line);background:#1a2537;color:var(--text);cursor:pointer;transition:opacity .15s}
+button:hover{opacity:.9}
+button.primary{background:var(--gold);color:#111;font-weight:700;border-color:#dfc18f}
 button.good{background:var(--green);border-color:#2db476}
-button.warn{background:var(--orange);color:#151515}
 button.danger{background:var(--red)}
 button.small{padding:7px 10px;border-radius:10px;font-size:13px}
-input,select,textarea{width:100%;background:#0f141b;border:1px solid var(--line);color:var(--text);border-radius:10px;padding:9px 10px}
-label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px}
-.grid{display:grid;gap:14px}
-.kpi-grid{grid-template-columns:repeat(auto-fit,minmax(185px,1fr));margin:12px 0}
-.cards-2{grid-template-columns:1.2fr .8fr}
-.cards-3{grid-template-columns:1fr 1fr 1fr}
-@media(max-width:1100px){.cards-2,.cards-3{grid-template-columns:1fr}}
-.card{background:rgba(18,24,33,.98);border:1px solid var(--line);border-radius:18px;padding:14px;box-shadow:0 14px 32px rgba(0,0,0,.22)}
-.kpi{min-height:100px;display:flex;flex-direction:column;justify-content:center}
-.kpi .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
-.kpi .val{font-size:clamp(18px,1.8vw,28px);font-weight:800;margin-top:6px}
-.kpi .sub{font-size:11px;color:var(--muted);margin-top:4px}
-.sec{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:10px}
-.sec h2{font-size:16px}
-.acts{display:flex;flex-wrap:wrap;gap:8px}
-.fg{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;align-items:end}
-.tw{overflow:auto;border:1px solid var(--line);border-radius:14px;max-height:500px}
+.grid{display:grid;gap:12px}
+.kpi-grid{grid-template-columns:repeat(auto-fit,minmax(170px,1fr));margin-bottom:12px}
+.card{background:rgba(18,27,42,.97);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:var(--shadow)}
+.kpi .lbl{font-size:11px;color:var(--muted);text-transform:uppercase}
+.kpi .val{font-size:26px;font-weight:800;margin-top:6px}
+.kpi .sub{font-size:12px;color:var(--muted);margin-top:4px}
+.pos{color:#84e3b4}.neg{color:#ffb3af}.muted{color:var(--muted)}
+.tabbar{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.tabbar button.active{background:var(--gold);color:#111;font-weight:700}
+.tab{display:none}.tab.active{display:block}
+.sec{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.cards-2{grid-template-columns:1.15fr .85fr}
+@media(max-width:1100px){.cards-2{grid-template-columns:1fr}}
+.pill{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;padding:3px 9px;font-size:11px;color:var(--muted)}
+.report{white-space:pre-wrap;line-height:1.55;background:#0d1624;border:1px dashed #314864;border-radius:12px;padding:12px;font-size:13px}
+.list{display:grid;gap:8px}
+.li{display:flex;justify-content:space-between;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.tw{overflow:auto;border:1px solid var(--line);border-radius:12px;max-height:540px}
 table{width:100%;border-collapse:collapse}
-th,td{padding:10px 8px;border-bottom:1px solid var(--line);font-size:13px;text-align:left;vertical-align:middle}
-th{position:sticky;top:0;background:#131a23f2;backdrop-filter:blur(4px);z-index:1}
-tbody tr:hover{background:#111821}
-.r{text-align:right}.c{text-align:center}
-.badge{display:inline-flex;align-items:center;border-radius:999px;padding:3px 10px;font-size:11px;border:1px solid var(--line);color:var(--muted);background:#0f141b}
+th,td{padding:9px 8px;border-bottom:1px solid var(--line);font-size:13px;text-align:left}
+th{position:sticky;top:0;background:#141f31;z-index:1}
+.r{text-align:right}
+.badge{display:inline-flex;padding:2px 8px;border-radius:999px;font-size:11px;border:1px solid var(--line)}
 .badge.receita{background:rgba(31,157,98,.15);color:#86e3b5}
 .badge.despesa{background:rgba(221,90,84,.15);color:#ffb3af}
-.badge.transferencia{background:rgba(75,136,255,.15);color:#c4d9ff}
-.badge.pago,.badge.recebido{background:rgba(31,157,98,.16);color:#86e3b5}
-.badge.atrasado{background:rgba(221,90,84,.18);color:#ffb3af}
-.badge.aberto{background:rgba(240,173,78,.16);color:#ffd08d}
-.pill{display:inline-flex;align-items:center;border-radius:999px;padding:3px 10px;font-size:11px;border:1px solid var(--line);color:var(--muted);background:#0f141b}
-.list{display:grid;gap:8px}
-.li{display:flex;justify-content:space-between;gap:8px;padding-bottom:8px;border-bottom:1px solid var(--line);align-items:center}
-.muted{color:var(--muted)}.pos{color:#86e3b5}.neg{color:#ffb3af}
-.report{white-space:pre-wrap;line-height:1.6;background:#0e141b;border:1px dashed #344255;border-radius:14px;padding:14px;font-size:13px}
-.tabbar{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
-.tabbar button.active{background:var(--gold);color:#111;border-color:#e0c69a;font-weight:700}
-.tab{display:none}.tab.active{display:block}
-.mw{position:relative}
-.mp{display:none;position:absolute;right:0;top:calc(100% + 8px);min-width:230px;background:rgba(18,24,33,.99);border:1px solid var(--line);border-radius:16px;padding:10px;box-shadow:0 18px 36px rgba(0,0,0,.28);z-index:20}
-.mp.open{display:grid;gap:8px}
-.mp button{width:100%;text-align:left}
-.fp{display:none;position:absolute;right:0;top:calc(100% + 8px);min-width:290px;background:rgba(18,24,33,.99);border:1px solid var(--line);border-radius:16px;padding:12px;box-shadow:0 18px 36px rgba(0,0,0,.28);z-index:20}
-.fp.open{display:block}
-.fp .f{margin-bottom:10px}
-.modal{position:fixed;inset:0;background:rgba(4,8,14,.72);display:none;align-items:center;justify-content:center;padding:18px;z-index:60}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+input{width:100%;background:#0f1725;border:1px solid var(--line);color:var(--text);border-radius:10px;padding:9px 10px}
+.modal{position:fixed;inset:0;background:rgba(4,10,16,.75);display:none;align-items:center;justify-content:center;padding:18px;z-index:99}
 .modal.open{display:flex}
-.mc{width:min(700px,100%);max-height:85vh;overflow:auto;background:rgba(18,24,33,.99);border:1px solid var(--line);border-radius:18px;padding:18px}
-.auth-wrap{max-width:460px;margin:40px auto}
-.cg{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
-.ch{font-size:11px;text-transform:uppercase;color:var(--muted);padding:0 4px 4px}
-.cc{min-height:105px;background:linear-gradient(180deg,#101722,#0d131b);border:1px solid var(--line);border-radius:14px;padding:10px;display:flex;flex-direction:column;gap:6px;transition:transform .15s,border-color .15s}
-.cc:hover{transform:translateY(-1px);border-color:#465971}
-.cc.md{opacity:.3}.cc.pd{border-color:rgba(221,90,84,.4)}.cc.rd{border-color:rgba(31,157,98,.4)}.cc.xd{border-color:rgba(75,136,255,.4)}.cc.td{box-shadow:0 0 0 1px rgba(200,163,106,.5)}
-.cd{font-weight:700;font-size:13px}
-.cb{border:none;border-radius:10px;padding:7px 9px;text-align:left;font-size:12px;font-weight:700;cursor:pointer;width:100%}
-.cb.pay{background:rgba(221,90,84,.14);color:#ffc4bf}.cb.rec{background:rgba(31,157,98,.14);color:#9ce8c2}.cb.mix{background:rgba(75,136,255,.14);color:#c4d9ff}
-.ab{border:1px solid var(--line);border-left:4px solid var(--orange);background:#111821;border-radius:12px;padding:10px 12px;margin-bottom:8px}
-.sn{font-size:12px;color:var(--muted);margin-top:8px}
-.wh{background:rgba(200,163,106,.10)}
-.status-bar{background:#0f141b;border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin-bottom:14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;font-size:13px}
-@media(max-width:900px){.cg{grid-template-columns:repeat(2,1fr)}.ch{display:none}.cc{min-height:80px}.fp{min-width:260px;left:0;right:auto}}
+.mc{width:min(460px,100%);background:#122034;border:1px solid var(--line);border-radius:16px;padding:14px}
+.fg{display:grid;gap:10px}
+.fab{position:fixed;right:18px;bottom:20px;border-radius:50px;padding:12px 16px;background:var(--gold);color:#111;font-weight:800;border:1px solid #e7c99d;box-shadow:var(--shadow)}
+@media(min-width:981px){.fab{display:none}}
 </style>
 </head>
 <body>
-<div class="container">
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo">SC</div>
+      <div>
+        <h1>Saimom Car</h1>
+        <p>Gestão Financeira</p>
+      </div>
+    </div>
 
-<!-- STATUS BAR -->
-<div class="status-bar">
-  <span>🚗 <strong>Saimom Car</strong> | Gestão Financeira</span>
-  <span class="pill" id="authPill">não autenticado</span>
-  <span class="muted" id="syncMsg" style="font-size:12px">faça login para sincronizar com a nuvem</span>
-  <div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap">
-    <button class="small" onclick="syncNow()" id="btnSync" style="display:none">☁️ Sincronizar</button>
-    <button class="small danger" onclick="doSignOut()" id="btnLogout" style="display:none">Sair</button>
-    <button class="small primary" onclick="openAuthModal()" id="btnLogin">Entrar / Cadastrar</button>
-  </div>
+    <div class="nav">
+      <button data-tab="tab-dia" onclick="setTab('tab-dia',this)">🏠 Hoje</button>
+      <button data-tab="tab-lancamentos" onclick="setTab('tab-lancamentos',this)">📒 Lançamentos</button>
+      <button data-tab="tab-pagar" onclick="setTab('tab-pagar',this)">📤 Contas a Pagar</button>
+      <button data-tab="tab-receber" onclick="setTab('tab-receber',this)">📥 Contas a Receber</button>
+    </div>
+
+    <div>
+      <span class="pill" id="authPill">não autenticado</span>
+      <p class="muted" id="syncMsg" style="font-size:12px;margin-top:8px">faça login para sincronizar</p>
+    </div>
+  </aside>
+
+  <main class="container">
+    <div class="appbar">
+      <div>
+        <div class="app-title">Saimom Car • App Financeiro</div>
+        <div class="muted" style="font-size:12px">Lançamentos da planilha + base já existente no Supabase</div>
+      </div>
+      <div class="actions">
+        <input type="file" id="importLaunchFile" accept=".xlsx,.xls,.csv" style="display:none" />
+        <button class="small primary" onclick="document.getElementById('importLaunchFile').click()">📥 Importar planilha</button>
+        <button class="small" onclick="syncNow()" id="btnSync" style="display:none">☁️ Sincronizar</button>
+        <button class="small" onclick="openAuthModal()" id="btnLogin">Entrar</button>
+        <button class="small danger" onclick="doSignOut()" id="btnLogout" style="display:none">Sair</button>
+      </div>
+    </div>
+
+    <div class="grid kpi-grid" id="kpiGrid"></div>
+
+    <div class="tabbar" id="topTabs">
+      <button class="active" data-tab="tab-dia" onclick="setTab('tab-dia',this)">Hoje</button>
+      <button data-tab="tab-lancamentos" onclick="setTab('tab-lancamentos',this)">Lançamentos</button>
+      <button data-tab="tab-pagar" onclick="setTab('tab-pagar',this)">Contas a Pagar</button>
+      <button data-tab="tab-receber" onclick="setTab('tab-receber',this)">Contas a Receber</button>
+    </div>
+
+    <section id="tab-dia" class="tab active">
+      <div class="grid cards-2">
+        <div class="card">
+          <div class="sec"><h2>Lançamentos de hoje</h2><span class="pill" id="todayCount">0</span></div>
+          <div id="todaySummary" class="report"></div>
+        </div>
+        <div class="card">
+          <div class="sec"><h2>Resumo rápido</h2></div>
+          <div id="todayHighlights" class="list"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-lancamentos" class="tab">
+      <div class="card">
+        <div class="sec">
+          <h2>Lançamentos</h2>
+          <button class="small" onclick="loadFromSupabase()">Recarregar</button>
+        </div>
+        <div class="tw">
+          <table>
+            <thead>
+              <tr>
+                <th>Data</th><th>Descrição</th><th>Categoria</th><th>Tipo</th><th>Status</th><th class="r">Valor</th>
+              </tr>
+            </thead>
+            <tbody id="launchBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-pagar" class="tab">
+      <div class="card"><h2>Contas a Pagar</h2><p class="muted" style="margin-top:8px">Filtro: tipo despesa + status aberto.</p></div>
+    </section>
+
+    <section id="tab-receber" class="tab">
+      <div class="card"><h2>Contas a Receber</h2><p class="muted" style="margin-top:8px">Filtro: tipo receita + status aberto.</p></div>
+    </section>
+  </main>
 </div>
 
-<!-- TOPBAR -->
-<div class="topbar">
-  <div class="brand">
-    <h1>Saimom Car • Gestão Financeira V2</h1>
-    <p>Lançamentos • Contas a pagar e receber • Alertas • Fechamento mensal • Sincronizado na nuvem</p>
-  </div>
-  <div class="acts">
-    <input type="file" id="importLaunchFile" accept=".xlsx,.xls,.csv" style="display:none">
-    <input type="file" id="importBackupFile" accept=".json" style="display:none">
-    <div class="mw">
-      <button class="primary" onclick="toggleMenu('mainMenu',event)">Arquivo e backup ▾</button>
-      <div id="mainMenu" class="mp">
-        <button onclick="document.getElementById('importLaunchFile').click();closeMenu('mainMenu')">📥 Importar planilha Excel</button>
-        <button onclick="exportWorkbook();closeMenu('mainMenu')">📤 Exportar sistema Excel</button>
-        <button onclick="exportBackup();closeMenu('mainMenu')">💾 Backup JSON</button>
-        <button onclick="document.getElementById('importBackupFile').click();closeMenu('mainMenu')">🔄 Restaurar backup JSON</button>
-        <button class="warn" onclick="resetBase();closeMenu('mainMenu')">⚠️ Voltar base inicial</button>
+<button class="fab" onclick="document.getElementById('importLaunchFile').click()">+ Importar</button>
+
+<div class="modal" id="authModal">
+  <div class="mc">
+    <h3 style="margin-bottom:10px">Autenticação Supabase</h3>
+    <div class="fg">
+      <div><label style="font-size:12px;color:var(--muted)">Email</label><input id="authEmail" type="email" placeholder="email@dominio.com" /></div>
+      <div><label style="font-size:12px;color:var(--muted)">Senha</label><input id="authPass" type="password" placeholder="******" /></div>
+      <div class="actions">
+        <button class="good" onclick="signIn()">Entrar</button>
+        <button class="primary" onclick="signUp()">Cadastrar</button>
+        <button onclick="closeAuthModal()">Fechar</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- KPIs -->
-<div class="grid kpi-grid" id="kpiGrid"></div>
+<script>
+const SUPABASE_URL = 'https://SEU-PROJETO.supabase.co';
+const SUPABASE_ANON_KEY = 'SUA_ANON_KEY';
+const TABLE_NAME = 'lancamentos';
 
-<!-- TABS -->
-<div class="tabbar">
-  <button class="active" data-tab="tab-dia" onclick="setTab('tab-dia',this)">Hoje</button>
-  <button data-tab="tab-lancamentos" onclick="setTab('tab-lancamentos',this)">Lançamentos</button>
-  <button data-tab="tab-movimentos" onclick="setTab('tab-movimentos',this)">Receitas x Despesas</button>
-  <button data-tab="tab-pagar" onclick="setTab('tab-pagar',this)">Contas a Pagar</button>
-  <button data-tab="tab-receber" onclick="setTab('tab-receber',this)">Contas a Receber</button>
-  <button data-tab="tab-alertas" onclick="setTab('tab-alertas',this)">Alertas</button>
-  <button data-tab="tab-fechamento" onclick="setTab('tab-fechamento',this)">Fechamento</button>
-</div>
+const COLUMN_MAP = {
+  data: ['data', 'date', 'vencimento'],
+  descricao: ['descricao', 'descrição', 'historico', 'histórico'],
+  categoria: ['categoria', 'grupo'],
+  tipo: ['tipo', 'natureza'],
+  status: ['status', 'situacao', 'situação'],
+  valor: ['valor', 'amount', 'total']
+};
 
-<!-- TAB HOJE -->
-<section id="tab-dia" class="tab active">
-  <div class="grid cards-2" style="margin-bottom:14px">
-    <div class="card">
-      <div class="sec"><h2>Lançamentos de hoje</h2><span class="pill" id="todayCount">0</span></div>
-      <div id="todaySummary" class="report"></div>
-    </div>
-    <div class="card">
-      <div class="sec"><h2>Ações rápidas</h2><button class="small primary" onclick="todayLaunch();setTab('tab-lancamentos',document.querySelector('[data-tab=tab-lancamentos]'))">+ Novo lançamento hoje</button></div>
-      <div id="todayHighlights" class="list"></div>
-    </div>
-  </div>
-  
+let supabase = null;
+let launches = [];
+const brl = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+
+function setTab(id, btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('[data-tab]').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll(`[data-tab="${id}"]`).forEach(x => x.classList.add('active'));
+  if (btn) btn.classList.add('active');
+}
+
+function toNumber(v) {
+  if (typeof v === 'number') return v;
+  if (v == null) return 0;
+  return Number(String(v).replace(/\./g,'').replace(',', '.').replace(/[^0-9.-]/g,'')) || 0;
+}
+function normalizeType(t='') {
+  const v = String(t).trim().toLowerCase();
+  if (['entrada','receita','recebimento'].includes(v)) return 'receita';
+  if (['saida','saída','despesa','pagamento'].includes(v)) return 'despesa';
+  return v || 'despesa';
+}
+function normalizeStatus(s='') {
+  const v = String(s).trim().toLowerCase();
+  if (['pago','recebido','quitado'].includes(v)) return v === 'quitado' ? 'pago' : v;
+  if (['aberto','pendente'].includes(v)) return 'aberto';
+  return v || 'aberto';
+}
+function asISODate(v) {
+  if (!v) return new Date().toISOString().slice(0,10);
+  if (typeof v === 'number') {
+    const excelEpoch = new Date(Date.UTC(1899,11,30));
+    const dt = new Date(excelEpoch.getTime() + v * 86400000);
+    return dt.toISOString().slice(0,10);
+  }
+  const s = String(v).trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  const [d,m,y] = s.split('/');
+  if (d && m && y) return `${y.padStart(4,'20')}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`;
+  const dt = new Date(s);
+  return Number.isNaN(dt.getTime()) ? new Date().toISOString().slice(0,10) : dt.toISOString().slice(0,10);
+}
+function mapSpreadsheetRow(row) {
+  const keyOf = aliases => Object.keys(row).find(k => aliases.includes(String(k).trim().toLowerCase()));
+  const get = aliases => row[keyOf(aliases)] ?? '';
+  return {
+    data: asISODate(get(COLUMN_MAP.data)),
+    descricao: String(get(COLUMN_MAP.descricao) || 'Sem descrição').trim(),
+    categoria: String(get(COLUMN_MAP.categoria) || 'Geral').trim(),
+    tipo: normalizeType(get(COLUMN_MAP.tipo)),
+    status: normalizeStatus(get(COLUMN_MAP.status)),
+    valor: toNumber(get(COLUMN_MAP.valor))
+  };
+}
+
+function render() {
+  const body = document.getElementById('launchBody');
+  body.innerHTML = launches.sort((a,b)=>String(b.data).localeCompare(String(a.data))).map(l => `
+    <tr>
+      <td>${l.data}</td>
+      <td>${l.descricao}</td>
+      <td>${l.categoria || '-'}</td>
+      <td><span class="badge ${l.tipo}">${l.tipo}</span></td>
+      <td>${l.status || '-'}</td>
+      <td class="r ${l.tipo === 'receita' ? 'pos' : 'neg'}">${brl.format(Math.abs(toNumber(l.valor)))}</td>
+    </tr>
+  `).join('');
+
+  const receitas = launches.filter(x=>x.tipo==='receita').reduce((s,x)=>s + toNumber(x.valor),0);
+  const despesas = launches.filter(x=>x.tipo==='despesa').reduce((s,x)=>s + toNumber(x.valor),0);
+  const saldo = receitas - despesas;
+  document.getElementById('kpiGrid').innerHTML = `
+    <div class="card kpi"><div class="lbl">Receitas</div><div class="val pos">${brl.format(receitas)}</div><div class="sub">Total carregado</div></div>
+    <div class="card kpi"><div class="lbl">Despesas</div><div class="val neg">${brl.format(despesas)}</div><div class="sub">Total carregado</div></div>
+    <div class="card kpi"><div class="lbl">Saldo</div><div class="val ${saldo >= 0 ? 'pos' : 'neg'}">${brl.format(saldo)}</div><div class="sub">Receitas - despesas</div></div>
+    <div class="card kpi"><div class="lbl">Lançamentos</div><div class="val">${launches.length}</div><div class="sub">Registros Supabase</div></div>
+  `;
+
+  const today = new Date().toISOString().slice(0,10);
+  const dayRows = launches.filter(x => x.data === today);
+  const rec = dayRows.filter(x => x.tipo === 'receita').reduce((s,x)=>s + toNumber(x.valor),0);
+  const des = dayRows.filter(x => x.tipo === 'despesa').reduce((s,x)=>s + toNumber(x.valor),0);
+  document.getElementById('todayCount').textContent = String(dayRows.length);
+  document.getElementById('todaySummary').textContent = `Data: ${today}\nReceitas do dia: ${brl.format(rec)}\nDespesas do dia: ${brl.format(des)}\nSaldo do dia: ${brl.format(rec-des)}`;
+  document.getElementById('todayHighlights').innerHTML = `
+    <div class="li"><span>Receitas abertas</span><strong>${launches.filter(x=>x.tipo==='receita' && x.status==='aberto').length}</strong></div>
+    <div class="li"><span>Despesas abertas</span><strong>${launches.filter(x=>x.tipo==='despesa' && x.status==='aberto').length}</strong></div>
+    <div class="li"><span>Última atualização</span><strong>${new Date().toLocaleTimeString('pt-BR')}</strong></div>
+  `;
+}
+
+function applyAuthState(ok) {
+  document.getElementById('authPill').textContent = ok ? 'autenticado' : 'não autenticado';
+  document.getElementById('syncMsg').textContent = ok ? 'conectado ao Supabase' : 'faça login para sincronizar';
+  document.getElementById('btnSync').style.display = ok ? 'inline-block' : 'none';
+  document.getElementById('btnLogout').style.display = ok ? 'inline-block' : 'none';
+  document.getElementById('btnLogin').style.display = ok ? 'none' : 'inline-block';
+}
+
+async function initSupabase() {
+  if (SUPABASE_URL.includes('SEU-PROJETO') || SUPABASE_ANON_KEY.includes('SUA_ANON_KEY')) {
+    document.getElementById('syncMsg').textContent = 'configure SUPABASE_URL e SUPABASE_ANON_KEY';
+    return;
+  }
+  supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const { data: { session } } = await supabase.auth.getSession();
+  applyAuthState(Boolean(session));
+  supabase.auth.onAuthStateChange((_e, sessionData) => applyAuthState(Boolean(sessionData)));
+  if (session) await loadFromSupabase();
+}
+
+async function loadFromSupabase() {
+  if (!supabase) return;
+  const { data, error } = await supabase.from(TABLE_NAME).select('*').order('data', { ascending:false });
+  if (error) return alert('Erro ao carregar: ' + error.message);
+  launches = data || [];
+  render();
+}
+async function syncNow(){ await loadFromSupabase(); }
+
+async function saveRowsToSupabase(rows) {
+  if (!supabase) return alert('Faça login para importar e salvar no Supabase.');
+  if (!rows.length) return;
+  const { error } = await supabase.from(TABLE_NAME).upsert(rows, { onConflict: 'data,descricao,valor,tipo' });
+  if (error) return alert('Erro ao salvar: ' + error.message);
+  await loadFromSupabase();
+}
+
+document.getElementById('importLaunchFile').addEventListener('change', async (ev) => {
+  const file = ev.target.files?.[0];
+  if (!file) return;
+  const buf = await file.arrayBuffer();
+  const wb = XLSX.read(buf, { type:'array' });
+  const first = wb.SheetNames[0];
+  const rowsRaw = XLSX.utils.sheet_to_json(wb.Sheets[first], { defval:'' });
+  const rows = rowsRaw.map(mapSpreadsheetRow).filter(r => r.descricao && r.valor !== 0);
+  if (!rows.length) return alert('Nenhum lançamento válido encontrado na planilha.');
+  await saveRowsToSupabase(rows);
+  ev.target.value = '';
+});
+
+function openAuthModal(){ document.getElementById('authModal').classList.add('open'); }
+function closeAuthModal(){ document.getElementById('authModal').classList.remove('open'); }
+async function signIn() {
+  if (!supabase) return;
+  const email = document.getElementById('authEmail').value.trim();
+  const password = document.getElementById('authPass').value;
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) return alert(error.message);
+  closeAuthModal();
+  await loadFromSupabase();
+}
+async function signUp() {
+  if (!supabase) return;
+  const email = document.getElementById('authEmail').value.trim();
+  const password = document.getElementById('authPass').value;
+  const { error } = await supabase.auth.signUp({ email, password });
+  if (error) return alert(error.message);
+  alert('Cadastro realizado. Verifique seu email se confirmação estiver habilitada.');
+}
+async function doSignOut() {
+  if (!supabase) return;
+  await supabase.auth.signOut();
+  launches = [];
+  render();
+}
+
+render();
+initSupabase();
+</script>
+</body>
+</html>
